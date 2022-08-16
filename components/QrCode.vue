@@ -6,7 +6,7 @@
             <div id="reader" class="reader"></div>
         </div>
         <el-button v-if="scanCloseShow" @click="scanEnd" type="warning" round>Завершить</el-button>
-        <el-input v-if="qrCodeInputShow" placeholder="Please input" v-model="qrCodeText"></el-input>
+        <el-input placeholder="Please input" v-model="qrCodeText"></el-input>
     </div>
 </template>
 
