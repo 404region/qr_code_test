@@ -1,13 +1,14 @@
 <template>
-  <QrCode />
+  <MyQrCode />
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import QrCode from '../components/QrCode.vue';
+import MyQrCodeScanner from '../components/MyQrCodeScanner.vue';
+import MyQrCode from '../components/MyQrCode.vue';
 
 export default Vue.extend({
     name: "IndexPage",
-    components: { QrCode }
+    components: { MyQrCodeScanner, MyQrCode }
 })
 </script>

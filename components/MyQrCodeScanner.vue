@@ -14,7 +14,7 @@
     import {Html5QrcodeScanner} from "html5-qrcode";
 
     export default {
-        name: 'QrCode',
+        name: 'MyQrCodeScanner',
         data() {
             return {
                 scanCloseShow: false,
