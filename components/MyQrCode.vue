@@ -2,29 +2,37 @@
     <div>
         <h3>Сканировать QR Code</h3>
         <el-button @click="scanIt" type="primary" round>Сканировать</el-button>
-        <div class="reader-block reader-block--padding">
-            <div id="reader" class="reader"></div>
-        </div>
-        <el-button v-if="scanCloseShow" @click="scanEnd" type="warning" round>Завершить</el-button>
-        <el-input placeholder="Здесь будет ваш QR Code" v-model="qrCodeText"></el-input>
+         <el-input placeholder="Здесь будет ваш QR Code" v-model="qrCodeText" class="qrcode-input"></el-input>
+        <transition appear>
+            <div class="modal-overlay" v-if="showModal">
+                <div class="modal">
+                    <div class="modal__inner-block">
+                        <div class="reader-block reader-block--padding">
+                            <div id="reader" class="reader"></div>
+                        </div>
+                        <el-button @click="scanEnd" type="warning" round>Завершить</el-button>
+                    </div>
+                </div>
+            </div>
+       </transition>
     </div>
 </template>
 <script>
     import {Html5Qrcode} from "html5-qrcode";
 
+
     export default {
         name: 'MyQrCode',
         data() {
             return {
-                scanCloseShow: false,
                 qrCodeText: '',
-                html5QrcodeScanner: {} ,
+                html5QrcodeScanner: {},
+                showModal: false,
             }
         },
         methods: {
             myScanSuccess(decodedResult) {
                 // Скрываем\показываем элементы, отображаем результат
-                //this.scanCloseShow = false;
                 console.log(this);
                 this.qrCodeText = decodedResult.decodedText;
             },
@@ -36,12 +44,11 @@
                 }).catch(error => {
                     // Could not stop scanning for reasons specified in `error`.
                     // This conditions should ideally not happen.
-                });
-                //Скрываем кнопку "Завершить"
-                this.scanCloseShow = false;*/
+                });*/
             },
             scanIt() {
                 const vueObj = this;
+                vueObj.showModal = true;
                  console.log('start scan');
                 Html5Qrcode.getCameras().then(devices => {
                     /** 
@@ -89,5 +96,25 @@
 </script>
 
 <style>
-
+    .qrcode-input {
+        padding: 26px 0;
+    }
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index:98;
+        background-color: rgba(0, 0, 0, 0.3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal__inner-block {
+        background-color: #fff;
+        border-radius: 20px;
+        border: 1px solid gray;
+        padding: 20px;
+    }
 </style>
