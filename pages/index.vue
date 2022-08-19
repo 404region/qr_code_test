@@ -3,11 +3,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import MyQrCode from '../components/MyQrCode.vue';
+import { Component, Vue } from "nuxt-property-decorator";
 
-export default Vue.extend({
-    name: "IndexPage",
-    components: { MyQrCode }
+@Component({
+    components: { MyQrCode  },
 })
+export default class IndexPage extends Vue {
+
+}
 </script>
