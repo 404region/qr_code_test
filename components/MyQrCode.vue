@@ -107,4 +107,10 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
         border: 1px solid gray;
         padding: 20px;
     }
+    .reader {
+        width: 600px;
+    }
+    .reader-block--padding {
+        padding: 30px;
+    }
 </style>
