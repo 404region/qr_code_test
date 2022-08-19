@@ -20,24 +20,26 @@
 <script lang="ts">
     import { defineComponent } from "vue";
     import {Html5Qrcode} from "html5-qrcode";
+import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
 
     export default defineComponent({
         name: 'MyQrCode',
         data() {
             return {
                 qrCodeText: '' as string,
-                html5Qrcode: {} as any,
+                html5Qrcode: {} as Html5Qrcode,
                 showModal: false as boolean,
+                cameraId: '' as string,
             }
         },
         methods: {
-            myScanSuccess(decodedResult) {
+            myScanSuccess(decodedResult: Html5QrcodeResult) {
                 // Скрываем\показываем элементы, отображаем результат
                 this.qrCodeText = decodedResult.decodedText;
             },
             scanEnd() {
                 this.showModal = false;
-                (this.html5QrCode as any).stop().then((ignore) => {
+                (this.html5QrCode as Html5Qrcode).stop().then((ignore) => {
                 // QR Code scanning is stopped.
                 }).catch((err) => {
                 // Stop failed, handle it.
@@ -56,13 +58,13 @@
                         vueObj.cameraId = devices[0].id; 
                         // .. use this to start scanning.
                         vueObj.html5QrCode = new Html5Qrcode(/* element id */ "reader");
-                        (vueObj.html5QrCode as any).start(
+                        (vueObj.html5QrCode as Html5Qrcode).start(
                             vueObj.cameraId, 
                             {
                                 fps: 10,    // Optional, frame per seconds for qr code scanning
                                 qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
                             },
-                            (decodedText, decodedResult) => {
+                            (decodedText: string, decodedResult) => {
                                 // do something when code is read
                                 vueObj.myScanSuccess(decodedResult);
                                 vueObj.scanEnd();
