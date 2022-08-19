@@ -39,11 +39,16 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
             },
             scanEnd() {
                 this.showModal = false;
-                (this.html5QrCode as Html5Qrcode).stop().then((ignore) => {
-                // QR Code scanning is stopped.
-                }).catch((err) => {
-                // Stop failed, handle it.
-                });
+                
+                try {
+                    (this.html5QrCode as Html5Qrcode).stop().then((ignore) => {
+                    // QR Code scanning is stopped.
+                    }).catch((err) => {
+                    // Stop failed, handle it.
+                    });
+                } catch (error) {
+                    
+                }
 
             },
             scanIt() {
