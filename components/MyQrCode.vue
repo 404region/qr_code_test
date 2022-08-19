@@ -17,16 +17,17 @@
        </transition>
     </div>
 </template>
-<script>
+<script lang="ts">
+    import { defineComponent } from "vue";
     import {Html5Qrcode} from "html5-qrcode";
 
-    export default {
+    export default defineComponent({
         name: 'MyQrCode',
         data() {
             return {
-                qrCodeText: '',
-                html5QrcodeScanner: {},
-                showModal: false,
+                qrCodeText: '' as string,
+                html5Qrcode: {} as any,
+                showModal: false as boolean,
             }
         },
         methods: {
@@ -35,9 +36,8 @@
                 this.qrCodeText = decodedResult.decodedText;
             },
             scanEnd() {
-                //Очищаем сканер
                 this.showModal = false;
-                this.html5QrCode.stop().then((ignore) => {
+                (this.html5QrCode as any).stop().then((ignore) => {
                 // QR Code scanning is stopped.
                 }).catch((err) => {
                 // Stop failed, handle it.
@@ -57,7 +57,7 @@
                         vueObj.cameraId = devices[0].id; 
                         // .. use this to start scanning.
                         vueObj.html5QrCode = new Html5Qrcode(/* element id */ "reader");
-                        vueObj.html5QrCode.start(
+                        (vueObj.html5QrCode as any).start(
                             vueObj.cameraId, 
                             {
                                 fps: 10,    // Optional, frame per seconds for qr code scanning
@@ -81,7 +81,7 @@
                 });
             }
         }
-    }
+    })
 </script>
 
 <style>
