@@ -23,7 +23,7 @@
     import { Component, Vue } from "nuxt-property-decorator";
 
     @Component({
-        components: {  },
+        
     })
     export default class MyQrCode extends Vue {
         qrCodeText:string = '';
