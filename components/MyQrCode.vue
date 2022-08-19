@@ -60,10 +60,9 @@
         }
 
         scanIt() {
-            const vueObj = this;
-            vueObj.showModal = true;
-            vueObj.loading = true;
-            vueObj.showCloseBtn = false;
+            this.showModal = true;
+            this.loading = true;
+            this.showCloseBtn = false;
 
             Html5Qrcode.getCameras().then(devices => {
                 /** 
@@ -71,27 +70,27 @@
                  * { id: "id", label: "label" }
                  */
                 if (devices && devices.length) {
-                    vueObj.cameraId = devices[0].id; 
+                    this.cameraId = devices[0].id; 
                     // .. use this to start scanning.
-                    vueObj.html5Qrcode = new Html5Qrcode(/* element id */ "reader");
+                    this.html5Qrcode = new Html5Qrcode(/* element id */ "reader");
 
                     this.html5Qrcode!.start(
-                        vueObj.cameraId, 
+                        this.cameraId, 
                         {
                             fps: 10,    // Optional, frame per seconds for qr code scanning
                             qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
                         },
                         (decodedText: string, decodedResult) => {
                             // do something when code is read
-                            vueObj.myScanSuccess(decodedResult);
-                            vueObj.scanEnd();
+                            this.myScanSuccess(decodedResult);
+                            this.scanEnd();
                         },
                         (errorMessage) => {
                             // камера долго грузится, поэтому чтобы не было пустового окна без камеры
                             // как только камера считывать первые данные убираю загрузку
-                            if(vueObj.loading) {
-                                vueObj.loading = false;
-                                vueObj.showCloseBtn = true;
+                            if(this.loading) {
+                                this.loading = false;
+                                this.showCloseBtn = true;
                             }
                             // parse error, ignore it.
                         }
@@ -101,12 +100,11 @@
                     });
                 }
             }).catch(err => {
-                console.log('err',err)
                 // handle err
                 if(err && err.match && err.match('NotAllowedError') != null) {
                     //Если не предоставели права на камеру сообщаем об этом
-                    vueObj.scanEnd();
-                    vueObj.openAlertNoCameraPermission(); 
+                    this.scanEnd();
+                    this.openAlertNoCameraPermission(); 
                 }
             });
         }
