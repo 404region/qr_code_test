@@ -18,13 +18,9 @@
     </div>
 </template>
 <script lang="ts">
-    import { defineComponent } from "vue";
     import { Html5Qrcode } from "html5-qrcode";
-    import { Html5QrcodeResult, Html5QrcodeSupportedFormats, QrcodeResult } from "html5-qrcode/esm/core";
-    import {
-        Component,
-        Vue,
-    } from "nuxt-property-decorator"
+    import { Html5QrcodeResult } from "html5-qrcode/esm/core";
+    import { Component, Vue } from "nuxt-property-decorator";
 
     @Component({
         components: {  },
