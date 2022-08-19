@@ -53,7 +53,6 @@
                      * { id: "id", label: "label" }
                      */
                     if (devices && devices.length) {
-                        console.log('devices', devices);
                         vueObj.cameraId = devices[0].id; 
                         // .. use this to start scanning.
                         vueObj.html5QrCode = new Html5Qrcode(/* element id */ "reader");
