@@ -19,95 +19,102 @@
 </template>
 <script lang="ts">
     import { defineComponent } from "vue";
-    import {Html5Qrcode} from "html5-qrcode";
-    import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
+    import { Html5Qrcode } from "html5-qrcode";
+    import { Html5QrcodeResult, Html5QrcodeSupportedFormats, QrcodeResult } from "html5-qrcode/esm/core";
+    import {
+        Component,
+        Vue,
+    } from "nuxt-property-decorator"
 
-    export default defineComponent({
-        name: 'MyQrCode',
-        data() {
-            return {
-                qrCodeText: '' as string,
-                html5Qrcode: {} as Html5Qrcode,
-                showModal: false as boolean,
-                cameraId: '' as string,
-                loading: false as boolean,
-                showCloseBtn: false as boolean,
-            }
-        },
-        methods: {
-            openAlertNoCameraPermission() {
-                this.$alert('Для сканирования Qr-Code необходимо предоставить доступ к камере', 'Ошибка', {
-                confirmButtonText: 'OK'
-                });
-            },
-            myScanSuccess(decodedResult: Html5QrcodeResult) {
-                // Скрываем\показываем элементы, отображаем результат
-                this.qrCodeText = decodedResult.decodedText;
-            },
-            scanEnd() {
-                this.showModal = false;
-                
-                try {
-                    (this.html5QrCode as Html5Qrcode).stop().then((ignore) => {
-                    // QR Code scanning is stopped.
-                    }).catch((err) => {
-                    // Stop failed, handle it.
-                    });
-                } catch (error) {
-                    
-                }
-
-            },
-            scanIt() {
-                const vueObj = this;
-                vueObj.showModal = true;
-                vueObj.loading = true;
-                Html5Qrcode.getCameras().then(devices => {
-                    /** 
-                     * devices would be an array of objects of type: 
-                     * { id: "id", label: "label" }
-                     */
-                    if (devices && devices.length) {
-                        vueObj.cameraId = devices[0].id; 
-                        // .. use this to start scanning.
-                        vueObj.html5QrCode = new Html5Qrcode(/* element id */ "reader");
-
-                        (vueObj.html5QrCode as Html5Qrcode).start(
-                            vueObj.cameraId, 
-                            {
-                                fps: 10,    // Optional, frame per seconds for qr code scanning
-                                qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
-                            },
-                            (decodedText: string, decodedResult) => {
-                                // do something when code is read
-                                vueObj.myScanSuccess(decodedResult);
-                                vueObj.scanEnd();
-                            },
-                            (errorMessage) => {
-                                // камера долго грузится, поэтому чтобы не было пустового окна без камеры
-                                // как только камера считывать первые данные убираю загрузку
-                                if(vueObj.loading) {
-                                    vueObj.loading = false;
-                                    vueObj.showCloseBtn = true;
-                                }
-                                // parse error, ignore it.
-                            }
-                        )
-                        .catch((err) => {
-                        // Start failed, handle it.
-                        });
-                    }
-                }).catch(err => { 
-                    // handle err
-                    if(err.match('NotAllowedError') != null) {
-                        //Если не предоставели права на камеру сообщаем об этом
-                        vueObj.scanEnd();
-                        vueObj.openAlertNoCameraPermission(); 
-                    }
-                });
-            }
-        }
+    @Component({
+        components: {  },
     })
+    export default class MyQrCode extends Vue {
+        qrCodeText:string = '';
+        html5Qrcode:Html5Qrcode | null = null;
+        showModal:boolean = false;
+        cameraId:string = '';
+        loading:boolean = false;
+        showCloseBtn:boolean = false;
+        
+        openAlertNoCameraPermission() {
+            this.$alert('Для сканирования Qr-Code необходимо предоставить доступ к камере', 'Ошибка', {
+            confirmButtonText: 'OK'
+            });
+        }
+
+        myScanSuccess(decodedResult: Html5QrcodeResult) {
+            // Скрываем\показываем элементы, отображаем результат
+            this.qrCodeText = decodedResult.decodedText;
+        }
+
+        scanEnd() {
+            this.showModal = false;
+            
+            try {
+                (this.html5Qrcode)!.stop().then((ignore) => {
+                // QR Code scanning is stopped.
+                }).catch((err) => {
+                // Stop failed, handle it.
+                });
+            } catch (error) {
+                
+            }
+
+        }
+
+        scanIt() {
+            const vueObj = this;
+            vueObj.showModal = true;
+            vueObj.loading = true;
+            vueObj.showCloseBtn = false;
+
+            Html5Qrcode.getCameras().then(devices => {
+                /** 
+                 * devices would be an array of objects of type: 
+                 * { id: "id", label: "label" }
+                 */
+                if (devices && devices.length) {
+                    vueObj.cameraId = devices[0].id; 
+                    // .. use this to start scanning.
+                    vueObj.html5Qrcode = new Html5Qrcode(/* element id */ "reader");
+
+                    this.html5Qrcode!.start(
+                        vueObj.cameraId, 
+                        {
+                            fps: 10,    // Optional, frame per seconds for qr code scanning
+                            qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
+                        },
+                        (decodedText: string, decodedResult) => {
+                            // do something when code is read
+                            vueObj.myScanSuccess(decodedResult);
+                            vueObj.scanEnd();
+                        },
+                        (errorMessage) => {
+                            // камера долго грузится, поэтому чтобы не было пустового окна без камеры
+                            // как только камера считывать первые данные убираю загрузку
+                            if(vueObj.loading) {
+                                vueObj.loading = false;
+                                vueObj.showCloseBtn = true;
+                            }
+                            // parse error, ignore it.
+                        }
+                    )
+                    .catch((err) => {
+                    // Start failed, handle it.
+                    });
+                }
+            }).catch(err => {
+                console.log('err',err)
+                // handle err
+                if(err && err.match && err.match('NotAllowedError') != null) {
+                    //Если не предоставели права на камеру сообщаем об этом
+                    vueObj.scanEnd();
+                    vueObj.openAlertNoCameraPermission(); 
+                }
+            });
+        }
+    }
 </script>
 
 <style>
