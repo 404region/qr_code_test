@@ -4,13 +4,13 @@
         <el-button @click="scanIt" type="primary" round>Сканировать</el-button>
          <el-input placeholder="Здесь будет ваш QR Code" v-model="qrCodeText" class="qrcode-input"></el-input>
         <transition appear>
-            <div class="modal-overlay" v-if="showModal">
+            <div class="modal-overlay" v-show="showModal">
                 <div class="modal">
-                    <div class="modal__inner-block">
+                    <div class="modal__inner-block" v-loading="loading">
                         <div class="reader-block reader-block--padding">
                             <div id="reader" class="reader"></div>
                         </div>
-                        <el-button @click="scanEnd" type="warning" round>Завершить</el-button>
+                        <el-button @click="scanEnd" type="warning" round v-show="showCloseBtn">Завершить</el-button>
                     </div>
                 </div>
             </div>
@@ -20,7 +20,7 @@
 <script lang="ts">
     import { defineComponent } from "vue";
     import {Html5Qrcode} from "html5-qrcode";
-import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
+    import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
 
     export default defineComponent({
         name: 'MyQrCode',
@@ -30,9 +30,16 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
                 html5Qrcode: {} as Html5Qrcode,
                 showModal: false as boolean,
                 cameraId: '' as string,
+                loading: false as boolean,
+                showCloseBtn: false as boolean,
             }
         },
         methods: {
+            openAlertNoCameraPermission() {
+                this.$alert('Для сканирования Qr-Code необходимо предоставить доступ к камере', 'Ошибка', {
+                confirmButtonText: 'OK'
+                });
+            },
             myScanSuccess(decodedResult: Html5QrcodeResult) {
                 // Скрываем\показываем элементы, отображаем результат
                 this.qrCodeText = decodedResult.decodedText;
@@ -54,6 +61,7 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
             scanIt() {
                 const vueObj = this;
                 vueObj.showModal = true;
+                vueObj.loading = true;
                 Html5Qrcode.getCameras().then(devices => {
                     /** 
                      * devices would be an array of objects of type: 
@@ -63,6 +71,7 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
                         vueObj.cameraId = devices[0].id; 
                         // .. use this to start scanning.
                         vueObj.html5QrCode = new Html5Qrcode(/* element id */ "reader");
+
                         (vueObj.html5QrCode as Html5Qrcode).start(
                             vueObj.cameraId, 
                             {
@@ -75,6 +84,12 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
                                 vueObj.scanEnd();
                             },
                             (errorMessage) => {
+                                // камера долго грузится, поэтому чтобы не было пустового окна без камеры
+                                // как только камера считывать первые данные убираю загрузку
+                                if(vueObj.loading) {
+                                    vueObj.loading = false;
+                                    vueObj.showCloseBtn = true;
+                                }
                                 // parse error, ignore it.
                             }
                         )
@@ -84,6 +99,11 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
                     }
                 }).catch(err => { 
                     // handle err
+                    if(err.match('NotAllowedError') != null) {
+                        //Если не предоставели права на камеру сообщаем об этом
+                        vueObj.scanEnd();
+                        vueObj.openAlertNoCameraPermission(); 
+                    }
                 });
             }
         }
@@ -111,6 +131,8 @@ import { Html5QrcodeResult, QrcodeResult } from "html5-qrcode/esm/core";
         border-radius: 20px;
         border: 1px solid gray;
         padding: 20px;
+        width: 660px;
+        height: 554px;
     }
     .reader {
         width: 600px;
