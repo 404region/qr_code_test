@@ -20,7 +20,6 @@
 <script>
     import {Html5Qrcode} from "html5-qrcode";
 
-
     export default {
         name: 'MyQrCode',
         data() {
@@ -33,23 +32,21 @@
         methods: {
             myScanSuccess(decodedResult) {
                 // Скрываем\показываем элементы, отображаем результат
-                console.log(this);
                 this.qrCodeText = decodedResult.decodedText;
             },
             scanEnd() {
                 //Очищаем сканер
-                console.log('end scanner')
-                /* this.html5QrcodeScanner.clear().then(_ => {
-                        // the UI should be cleared here 
-                }).catch(error => {
-                    // Could not stop scanning for reasons specified in `error`.
-                    // This conditions should ideally not happen.
-                });*/
+                this.showModal = false;
+                this.html5QrCode.stop().then((ignore) => {
+                // QR Code scanning is stopped.
+                }).catch((err) => {
+                // Stop failed, handle it.
+                });
+
             },
             scanIt() {
                 const vueObj = this;
                 vueObj.showModal = true;
-                 console.log('start scan');
                 Html5Qrcode.getCameras().then(devices => {
                     /** 
                      * devices would be an array of objects of type: 
@@ -78,20 +75,12 @@
                         .catch((err) => {
                         // Start failed, handle it.
                         });
-                            }
-                        }).catch(err => { 
-                            // handle err
-                        });
-
-                
-
-
-                 console.log('end scan');
+                    }
+                }).catch(err => { 
+                    // handle err
+                });
             }
-
-            
         }
-        
     }
 </script>
 
